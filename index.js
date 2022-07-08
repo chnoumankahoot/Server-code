@@ -38,17 +38,64 @@ const { query } = require("express");
 app.get("/", (req, res) => {
   res.json({ message: "Welcome to the application." });
 });
+//route to get all the tables from the database
+app.get("/gettables", (req, res) => {
+    
+    db.query("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_SCHEMA = 'meterics'", {
+        type: db.QueryTypes.SELECT
+        })
+        .then(tables => {
+            let arr=[];
+            tables.forEach(table => {
+                db.query("SELECT * FROM "+"meterics."+table.TABLE_NAME, {
+                    type: db.QueryTypes.SELECT
+                    })
+                    
+                    .then(data => {
+                        console.log(data[0])
+                        arr.push(data[0])
+                        if(arr.length==tables.length){
+                            res.json(arr)
+                        }
+                    }
+                )
+
+            }
+            );
+           
+        }
+        );
+}
+);
+
 app.post('/newApp', async(req, res) => {
     console.log(req.body);
     //define new table in db with strings
     try{
-    await db.define(req.body.appName,datastructure,{timestamps:false}
-        )
-     db.sync().then(async() => {
-         console.log("Table created successfully.");
-         await db.query(`INSERT INTO ${req.body.appName} (appName) VALUES ('${req.body.appName}')`);
-            res.json({message:"Table created successfully"});
-        });
+    const Usermodel=await db.define(req.body.appName,datastructure,{timestamps:false,tableName:req.body.appName});
+        
+     await db.sync({force:true});
+     
+     Usermodel.build({
+        appName: req.body.appName,
+        BillingIssues: 0,
+        Refundevents: 0,
+        RefundMoney: 0,
+        MRR: 0,
+        ARR: 0,
+        ARRPPU: 0,
+        ActiveSubscribers: 0,
+        NewSubscribers: 0,
+        Subcriptionrenewalscancelled: 0,
+        expiredsubcriptions: 0,
+        activeTrials: 0
+    }).save();
+
+    res.send(Usermodel.tableName+" table created successfully");
+     
+
+    //assign default values to new table
+    
         
     
 }   

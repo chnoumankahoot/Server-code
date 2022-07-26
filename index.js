@@ -163,7 +163,23 @@ app.post('/update', async(req, res) => {
         res.send(err);
     }
 })
+//get email count from the database if counter table exists
+app.get('/getEmailCount', async(req, res) => {
+    try{
     
+     let app = await db.query(`SELECT * FROM meterics.counter`);
+
+    res.send(app[0][0]);
+    
+}
+catch(err){
+    res.send(err);
+
+    }
+}
+)
+        
+
 
 // BillingIssues:
 // Refundevents

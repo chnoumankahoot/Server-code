@@ -183,7 +183,7 @@ app.post('/updateEmailCount', async(req, res) => {
     try{
         
       
-        await db.query(`UPDATE counter SET emailCount=emailCount+1`);
+        await db.query(`UPDATE counter SET email=email+1`);
         db.sync().then(async() => {
             console.log("Data updated successfully.");
             res.json({message:"Data updated successfully"});
@@ -200,7 +200,7 @@ app.post('/updatePush', async(req, res) => {
     {
        
       
-        await db.query(`UPDATE counter SET pushCount=pushCount+1`);
+        await db.query(`UPDATE counter SET pushnotification=pushnotification+1`);
         db.sync().then(async() => {
             console.log("Data updated successfully.");
             res.json({message:"Data updated successfully"});

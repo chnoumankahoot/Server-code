@@ -1,0 +1,3 @@
+user=nomi
+and password =nomi
+for the db on server

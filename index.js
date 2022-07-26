@@ -178,6 +178,39 @@ catch(err){
     }
 }
 )
+//update email count in the database if counter table exists
+app.post('/updateEmailCount', async(req, res) => {
+    try{
+        
+      
+        await db.query(`UPDATE counter SET emailCount=emailCount+1`);
+        db.sync().then(async() => {
+            console.log("Data updated successfully.");
+            res.json({message:"Data updated successfully"});
+        });
+    }
+    catch(err){
+        res.send(err);
+    }
+}
+)
+//update pushnotification count in the database if counter table exists
+app.post('/updatePush', async(req, res) => {
+    try
+    {
+       
+      
+        await db.query(`UPDATE counter SET pushCount=pushCount+1`);
+        db.sync().then(async() => {
+            console.log("Data updated successfully.");
+            res.json({message:"Data updated successfully"});
+        });
+    }
+    catch(err){
+        res.send(err);
+    }
+}
+)
         
 
 

@@ -119,7 +119,10 @@ app.post('/newApp', async(req, res) => {
         NewSubscribers: 0,
         Subcriptionrenewalscancelled: 0,
         expiredsubcriptions: 0,
-        activeTrials: 0
+        activeTrials: 0,
+        newTrials: 0,
+        trialrenewalscancelled: 0,
+        expiredTrials: 0,
     })
      usermodel.save().then(()=>{
         res.send("Table created successfully")

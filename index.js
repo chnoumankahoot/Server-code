@@ -39,30 +39,63 @@ app.get("/", (req, res) => {
 //route to get all the tables from the database
 app.get("/gettables", (req, res) => {
     
-    db.query("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_SCHEMA = 'meterics'", {
-        type: db.QueryTypes.SELECT
-        })
-        .then(tables => {
-            let arr=[];
-            tables.forEach(table => {
-                db.query("SELECT * FROM "+"meterics."+table.TABLE_NAME, {
+    // db.query("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_SCHEMA = 'meterics'", {
+    //     type: db.QueryTypes.SELECT
+    //     })
+    //     .then(tables => {
+    //         let arr=[];
+    //         tables.forEach(table => {
+    //             db.query("SELECT * FROM "+"meterics."+table.TABLE_NAME, {
+    //                 type: db.QueryTypes.SELECT
+    //                 })
+                    
+    //                 .then(data => {
+    //                     console.log(data[0])
+    //                     arr.push(data[0])
+    //                     if(arr.length==tables.length){
+    //                         res.json(arr)
+    //                     }
+    //                 }
+    //             )
+
+    //         }
+    //         );
+           
+    //     }
+    //     );
+    
+    let tablelist = [];
+    var arr=[];
+    db.showAllSchemas().then(schemas => {
+       schemas.forEach(schema => {
+         tablelist.push(schema.Tables_in_meterics)})
+    }).then(()=>{
+       
+        tablelist.forEach(table => {
+            if(table!=="counter"){
+                db.query("SELECT * FROM "+"meterics."+table, {
                     type: db.QueryTypes.SELECT
                     })
-                    
                     .then(data => {
-                        console.log(data[0])
-                        arr.push(data[0])
-                        if(arr.length==tables.length){
+                        console.log(`Query data for ${table} :`, data);
+                        
+                        if(data[0]!=undefined && data[0]!=null){
+                            arr.push(data[0])
+                        }
+                        if(arr.length===tablelist.length-1){
                             res.json(arr)
                         }
+                       
                     }
                 )
-
+    
             }
-            );
            
         }
-        );
+        )
+    })
+    
+    
 }
 );
 
@@ -72,9 +105,9 @@ app.post('/newApp', async(req, res) => {
     try{
     const Usermodel=await db.define(req.body.appName,datastructure,{timestamps:false,tableName:req.body.appName});
         
-     await db.sync({force:true});
-     
-     Usermodel.build({
+     Usermodel.sync({force:true}).then(()=>{
+    
+     const usermodel=Usermodel.build({
         appName: req.body.appName,
         BillingIssues: 0,
         Refundevents: 0,
@@ -87,9 +120,16 @@ app.post('/newApp', async(req, res) => {
         Subcriptionrenewalscancelled: 0,
         expiredsubcriptions: 0,
         activeTrials: 0
-    }).save();
+    })
+     usermodel.save().then(()=>{
+        res.send("Table created successfully")
+    })}).catch(err=>{
+        res.send(err)
+    }
+    )
+    
 
-    res.send(Usermodel.tableName+" table created successfully");
+   
      
 
     //assign default values to new table
@@ -167,9 +207,12 @@ app.post('/update', async(req, res) => {
 app.get('/getEmailCount', async(req, res) => {
     try{
     
-     let app = await db.query(`SELECT * FROM meterics.counter`);
+     let app = db.query(`SELECT * FROM meterics.counter`).then(data => {
+        res.send(data[0][0]);
+    }
+    )
 
-    res.send(app[0][0]);
+   
     
 }
 catch(err){

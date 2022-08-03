@@ -75,7 +75,27 @@ module.exports ={
         type: db.Sequelize.INTEGER,
         allowNull: false,
         defaultValue: '0'
-    }
+    },
+    totalnotificationsent:{
+        type: db.Sequelize.INTEGER,
+        allowNull: false,
+        defaultValue: '0'
+    },
+        totalpushnotificationsent:{
+            type: db.Sequelize.INTEGER,
+            allowNull: false,
+            defaultValue: '0'
+        },
+        successfulnotifications:{
+            type: db.Sequelize.INTEGER,
+            allowNull: false,
+            defaultValue: '0'
+        },
+        successfulpushnotifications:{
+            type: db.Sequelize.INTEGER,
+            allowNull: false,
+            defaultValue: '0'
+        }
   
 
     

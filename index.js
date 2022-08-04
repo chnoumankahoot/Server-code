@@ -192,7 +192,7 @@ app.post('/update', async(req, res) => {
         const type =req.body.type
         //check if the meteric is already in the table and if its value is greater than 0 incase if its a decrement value
         const check = await db.query(`SELECT * FROM meterics.${appName} WHERE ${meteric}>0`);
-        if(check[0].length>0 && type=="decrement"){
+        if(check[0].length>0 && type=="decrement"&&meteric!="successfulnotifications"&&meteric!="successfulpushnotifications"){
             //if the meteric is already in the table and its value is greater than 0 then update the value
             await db.query(`UPDATE ${appName} SET ${meteric}=${meteric}-1`);
             res.json({message:"Meteric updated successfully"});
@@ -200,7 +200,17 @@ app.post('/update', async(req, res) => {
         else{
         if(type=="increment"){
         type==="increment"?await db.query(`UPDATE ${appName} SET ${meteric} = ${meteric} + 1`):res.json({message:"Meteric type is not valid"});
-        }
+if(meteric==="successfulnotifications")
+{
+    await db.query(`UPDATE ${appName} SET totalnotificationsent = totalnotificationsent + 1`);  
+
+}
+else if(meteric==="successfulpushnotifications")
+{
+    await db.query(`UPDATE ${appName} SET totalpushnotificationsent = totalpushnotificationsent + 1`);  
+    
+}
+    }
     }
         db.sync().then(async() => {
             console.log("Data updated successfully.");
